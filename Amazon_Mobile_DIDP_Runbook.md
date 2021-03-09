@@ -6,10 +6,10 @@
 
 ****
 
-| Version |   Date   |     Editor/Reviewer     |          Comments           |
-| :-----: | :------: | :---------------------: | :-------------------------: |
-|   1.0   | 3/9/2021 | Kristoffer Buenaventura | First draft for DIDP Amazon |
-|         |          |                         |                             |
+| Version |   Date   |              Editor/Reviewer               |          Comments           |
+| :-----: | :------: | :----------------------------------------: | :-------------------------: |
+|   1.0   | 3/9/2021 | Dexter Taylor<br />Kristoffer Buenaventura | First draft for DIDP Amazon |
+|         |          |                                            |                             |
 
 
 
@@ -17,187 +17,102 @@
 
 ****
 
-- Python 3.5 or higher
+- **Python 3.5 or higher**
 - Unix command-line utilities: 
-- make 
-- curl
-- curl command is a tool to download or transfer files/data from or to a server using FTP, HTTP, HTTPS, SCP, SFTP, SMB and other supported protocols on Linux or Unix-like system.
-- Install via: $sudo apt-get install curl
-- jq
-- Unix filter utility for JSON data
-- Install via: $sudo apt-get install jq
-- pipenv
-- dos2unix
-- postgresql-client
-- postgresql-contrib
-- libpq-dev
+  - `pip`
+    - Python package-management system
+    - Install via: `$sudo apt-get install python3-pip`
+  - `make` 
+  - `curl`
+    - `curl` command is a tool to download or transfer files/data from or to a server using FTP, HTTP, HTTPS, SCP, SFTP, SMB and other supported protocols on Linux or Unix-like system.
+    - Install via: `$sudo apt-get install curl`
+  - `jq`
+    - Unix filter utility for JSON data
+    - Install via: `$sudo apt-get install jq`
+  - `pipenv`
+    - Python packaging tool
+    - Install via: `$sudo apt-get install pipenv`
+  - `dos2unix`
+    - Tool to convert line breaks in a text file from Unix format to DOS format and vice versa
+    - Install via: `$sudo apt-get install dos2unix`
+  - `postgresql-client`
+    - Install via (check with Dex)
+  - `postgresql-contrib`
+    - Install via (check with Dex)
+  - `libpq-dev`
+    - Install via (check with Dex)
 
+**To set up the tooling environment:**
 
-To set up the tooling environment:
+- issue `$pipenv install` to install the Python dependencies
+- issue `$pipenv shell` to start the virtual environment
+  - Or, if you are not using a virtual environment, issue `$pip install -r requirements.txt`
 
-issue "pipenv install" to install the Python dependencies
-issue "pipenv shell" to start the virtual environment
-(or, if you are not using a virtual env, issue "pip install -r requirements.txt")
-
-```yaml
-globals:
-    project_home: $TDX_HOME
-    service_module: tdx_services
-    processor_module: tdx_processors
-    macro_module: tdx_macros
-
-service_objects:
-
-macros:
-
-targets:
-
-    2k_token:
-        url: "https://api.amazon.com/auth/o2/token"
-        method: POST
-        headers:                        
-            Content-Type: application/x-www-form-urlencoded
-
-        request_params:
-          - name: grant_type
-            value: client_credentials
-
-          - name: client_id
-            value: amzn1.application-oa2-client.1a9d0e0d8a824b2fa2b4d6aa918d5c38
-              
-
-          - name: client_secret
-            value: $_2K_CLIENT_SECRET
-            
-          - name: scope
-            value: 'adx_reporting::appstore:marketer'
-
-    2k_data:
-      url: "https://developer.amazon.com/api/appstore/download/report/sales/{sales_year}/{sales_month}"
-      method: GET
-      headers:
-        Authorization: ~template[Bearer $(_2K_SESSION_TOKEN)]
-      
-      template_params:
-        sales_year: '2021'
-        sales_month: '03'
-
-
-    rockstar_token:
-        url: "https://api.amazon.com/auth/o2/token"
-        method: POST
-        headers:                        
-            Content-Type: application/x-www-form-urlencoded
-
-        request_params:
-          - name: grant_type
-            value: client_credentials
-
-          - name: client_id
-            value: amzn1.application-oa2-client.95ee38b2793b4b2db800f48872e8d6de
-
-          - name: client_secret
-            value: $ROCKSTAR_CLIENT_SECRET
-            
-          - name: scope
-            value: 'adx_reporting::appstore:marketer'
-
-
-    rockstar_data:
-      url: "https://developer.amazon.com/api/appstore/download/report/sales/{sales_year}/{sales_month}"
-      method: GET
-      headers:
-        Authorization: ~template[Bearer $(ROCKSTAR_SESSION_TOKEN)]
-      
-      template_params:
-        sales_year: '2021'
-        sales_month: '03'
-
-
-    rockstar_download:
-      url: https://appstore-adx-reporting-sales-reports-prod.s3.amazonaws.com/monthly/20915/90-0202/sales-2020-09.zip
-      method: GET
-      headers:
-
-      request_params:
-        - name: X-Amz-Algorithm
-          value: "AWS4-HMAC-SHA256"
-
-        - name: X-Amz-Date
-          value: "20210129T184133Z"
-          
-        - name: X-Amz-SignedHeaders
-          value: host
-
-        - name: X-Amz-Expires
-          value: 299
-
-        - name: X-Amz-Credential
-          value: "AKIARUHABELWDF4JDXNQ%2F20210129%2Fus-east-1%2Fs3%2Faws4_request"
-  
-        - name: X-Amz-Signature
-          value: 6001e04ca8838d8ec6e6288d90359b908a682453d23bc3346ed3bef885bc2578
-
-
-    socialpoint_token:
-        url: "https://api.amazon.com/auth/o2/token"
-        method: POST
-        headers:                        
-            Content-Type: application/x-www-form-urlencoded
-
-        request_params:
-          - name: grant_type
-            value: client_credentials
-
-          - name: client_id
-            value: amzn1.application-oa2-client.c2b36f7be248493e809803172a8bd8f9
-
-          - name: client_secret
-            value: $SOCIALPOINT_CLIENT_SECRET
-            
-          - name: scope
-            value: 'adx_reporting::appstore:marketer'
-
-
-    socialpoint_data:
-      url: "https://developer.amazon.com/api/appstore/download/report/sales/{sales_year}/{sales_month}"
-      method: GET
-      headers:
-        Authorization: ~template[Bearer $(SOCIALPOINT_SESSION_TOKEN)]
-      
-      template_params:
-        sales_year: '2021'
-        sales_month: '03'
-```
-
-
-
-#### ENVIRONMENTAL VARIABLE SETUP
+#### MAKE PIPELINES
 
 ****
 
-- EPIC_API_VERSION (this should be "v2")
-- TDX_HOME (this should be set to the repo root directory)
-- TUBULAR_API_KEY 
-- S3_BUCKET_NAME -- this is the name of the bucket to which pipeline targets will upload files. It should not include the s3:// prefix OR any subfolders.
-- SNS_NOTIFICATION_TOPIC -- set this to the ARN of the SNS topic you plan to use for pipeline notifications
-- SONY_ACCOUNT_ID
-- SONY_ACCOUNT_TOKEN
-- SONY_SESSION_TOKEN -- set this to the output of the following command:
-  curl -v --user $SONY_ACCOUNT_ID:$SONY_ACCOUNT_TOKEN "https://api.domo.com/oauth/token?grant_type=client_credentials&scope=data" |jq -r .access_token
+Because each T2 label has its own Amazon Developer account, we have created a separated Make pipeline for each label.**
 
-(there is a script for this: get_sony_token.sh.)
+At a high level, the make pipeline process does not change by label. 
 
-(For Snowflake-aware data processing, set the following environment vars:
+###### Make Pipeline Process
 
-SNOWFLAKE_WAREHOUSENAME
-SNOWFLAKE_ROLE
-SNOWFLAKE_PASSWORD
-SNOWFLAKE_USERNAME
-SNOWFLAKE_ACCOUNT
-SNOWFLAKE_DATABASE
+###### Make Targets (Unix)
 
-)
+- 2K
+
+  - ```makefile
+    make pipeline-amazon-2k-data
+    ```
+
+    
+
+- Rockstar
+
+  - ```makefile
+    make pipeline-amazon-rockstar-data
+    ```
+
+    
+
+- Social Point
+
+  - ```makefile
+    make pipeline-amazon-socialpoint-data
+    ```
+
+#### ENVIRONMENT VARIABLE SETUP
+
+****
+
+Before any Make Pipeline can be run successful, there are several Environment & Session variables that will need to be set up:
+
+- `S3_BUCKET_PATH`
+
+  - The path of the AWS S3 bucket to which pipeline targets will upload files. It should not include the `s3://` prefix OR any subfolders.
+
+- `SNS_NOTIFICATION_TOPIC`
+
+  - Set this to the ARN of the SNS topic you plan to use for pipeline notifications
+
+- `SONY_ACCOUNT_ID`
+
+- `SONY_ACCOUNT_TOKEN`
+
+- `SONY_SESSION_TOKEN` 
+
+  - Set this to the output of the following command:
+
+    ```
+    curl -v --user $SONY_ACCOUNT_ID:$SONY_ACCOUNT_TOKEN "https://api.domo.com/oauth/token?grant_type=client_credentials&scope=data" |jq -r .access_token
+    ```
+
+    
+
+  - **There is a script for this: `get_sony_token.sh`**
+
+
 
 
 > For the Sony data pipelines:
@@ -207,7 +122,6 @@ run the desired make target from the Makefile.
 Example: "make pipeline-sony-americas" will pull 30-day sales tallies for the 
 Sony Americas region. There is one target for each of the four regions we care about:
 americas, europe, japan, and asia.
-
 
 --> For the Epic data pipelines:
 
@@ -235,9 +149,11 @@ http://<host>:6050/ping
 
 to verify that it's alive. 
 
-#### MAKE TARGETS
+#### GIT REPOSITORY
 
-#### YAML, CONFIG, & URL INFO
+#### SCHEDULED JOBS
+
+#### DATA RECONCILIATION
 
 #### RESOURCES & API DOCUMENTATION
 
